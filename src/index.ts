@@ -11,7 +11,7 @@ function parse(content: string): string {
 
 // Import these from package.json in the future
 const name = 'md2html';
-const version = '0.1.0';
+const version = '0.1.1';
 const description = 'A simple tool to convert markdown content to html';
 
 /* Command-line tool logic */
