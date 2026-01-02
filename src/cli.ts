@@ -1,6 +1,6 @@
 import { program } from 'commander';
 import * as fs from 'fs';
-import { parse } from './parser';
+import { parse } from './index';
 
 // Import these from package.json in the future
 const name = 'md2html';
