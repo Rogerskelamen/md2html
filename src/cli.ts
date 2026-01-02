@@ -4,7 +4,7 @@ import { parse } from './index';
 
 // Import these from package.json in the future
 const name = 'md2html';
-const version = '0.1.1';
+const version = '0.1.2';
 const description = 'A simple tool to convert markdown content to html';
 
 /* Command-line tool logic */
