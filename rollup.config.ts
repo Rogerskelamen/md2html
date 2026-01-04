@@ -1,6 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 
 /* Export as a command line */
 const cliBundle = {
@@ -13,7 +14,10 @@ const cliBundle = {
   plugins: [
     resolve(),
     commonjs(),
-    typescript()
+    json(),
+    typescript({
+      tsconfig: './tsconfig.json'
+    })
   ]
 };
 
@@ -26,7 +30,9 @@ const libBundle = {
   },
   plugins: [
     resolve(),
-    typescript()
+    typescript({
+      tsconfig: './tsconfig.json'
+    })
   ]
 };
 

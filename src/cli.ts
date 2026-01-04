@@ -1,11 +1,7 @@
 import { program } from 'commander';
 import * as fs from 'fs';
 import { parse } from './index';
-
-// Import these from package.json in the future
-const name = 'md2html';
-const version = '0.1.2';
-const description = 'A simple tool to convert markdown content to html';
+import { name, version, description } from '../package.json';
 
 /* Command-line tool logic */
 function command(): void {

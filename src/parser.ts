@@ -1,14 +1,9 @@
-/* The main parse logic */
-
-import { headerReg } from "./regexp";
-import { HeaderLevel, MDBlock, TextQuoteBlock } from "./type";
-
 /**
  * Since AST-based parsing is too complex and not
- * suitable for a typescript learning projct,
+ * suitable for a personal typescript learning project,
  * So I just let my markdown rendering engine to
  * receive a line and analysis which type it is,
- * and then output the corresponding format.
+ * and then output the corresponding format(with tags).
  * That means it's just a simple line-by-line parsing.
  *
  * Some special scenes still need to be handled carefully:
@@ -27,8 +22,12 @@ import { HeaderLevel, MDBlock, TextQuoteBlock } from "./type";
  * ```
  * is one paragraph as well.
  */
-export function parse(markdown: string): string {
 
+import { headerReg } from "./regexp";
+import { HeaderLevel, MDBlock, TextQuoteBlock } from "./type";
+
+/* The main parse logic */
+export function parse(markdown: string): string {
   /* Split markdown content to many lines */
   const crlfReg = /\r?\n/;
   const lines = markdown.split(crlfReg);
@@ -99,7 +98,8 @@ function handleTags(mdBlocks: MDBlock[]): string {
 
   for (const block of mdBlocks) {
     const type = block.type;
-    const content = wrapInPosition(block);
+    const content = tagSwtich(block);
+
     switch (type) {
       case "text":
         result += `<p>${content}</p>` +
@@ -117,6 +117,6 @@ function handleTags(mdBlocks: MDBlock[]): string {
   return result;
 }
 
-function wrapInPosition(block: MDBlock): string {
+function tagSwtich(block: MDBlock): string {
   return block.content;
 }
