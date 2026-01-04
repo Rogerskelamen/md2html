@@ -23,8 +23,8 @@
  * is one paragraph as well.
  */
 
-import { headerReg } from "./regexp";
-import { HeaderLevel, MDBlock, TextQuoteBlock } from "./type";
+import { headingReg, quoteReg } from "./regexp";
+import { HeadingLevel, MDBlock, MultiLinesBlock } from "./type";
 
 /* The main parse logic */
 export function parse(markdown: string): string {
@@ -44,51 +44,68 @@ export function parse(markdown: string): string {
  * Traverse lines to turn to blocks with different types
  */
 function parseToBlocks(lines: string[]): MDBlock[] {
-  let lastTextQuoteBlock: TextQuoteBlock = { content: '', type: 'text' };
-  let pushed: boolean = true;
+  let lastMultiLinesBlock: MultiLinesBlock | null = null;
   const mdBlocks: MDBlock[] = [];
 
-  for (const line of lines) {
+  const flush = () => {
+    if (lastMultiLinesBlock) {
+      mdBlocks.push(lastMultiLinesBlock);
+      lastMultiLinesBlock = null;
+    }
+  }
 
+  for (const line of lines) {
     // Empty line
-    if (!Boolean(line.trim())) {
-      if (!pushed) {
-        mdBlocks.push(lastTextQuoteBlock);
-        pushed = true;
-      }
+    if (!line.trim()) {
+      flush();
       continue;
     }
 
-    // Header
-    const headerM = line.match(headerReg);
-    if (headerM) {
+    // Headings
+    const headingM = line.match(headingReg);
+    if (headingM) {
+      flush();
       mdBlocks.push({
-        type: 'header',
-        level: headerM[1].length as HeaderLevel,
-        content: headerM[2].trim()
+        type: 'heading',
+        level: headingM[1].length as HeadingLevel,
+        content: headingM[2].trim()
       });
       continue;
     }
 
+    // Quote
+    const quoteM = line.match(quoteReg);
+    if (quoteM) {
+      /* Last line is quote as well */
+      if (lastMultiLinesBlock?.type === 'quote') {
+        lastMultiLinesBlock.content += ' ' + quoteM[1].trim();
+      } else {
+        flush();
+        lastMultiLinesBlock = {
+          type: 'quote',
+          content: quoteM[1].trim()
+        };
+      }
+      continue;
+    }
+
     // Fall back to plain text
-    if (!pushed) {
-      /* last line is also text */
-      lastTextQuoteBlock.content += ' ' + line.trim();
+    if (
+      lastMultiLinesBlock &&
+      ['text', 'quote'].includes(lastMultiLinesBlock.type)
+    ) {
+      lastMultiLinesBlock.content += ' ' + line.trim();
     } else {
-      lastTextQuoteBlock = {
+      flush();
+      lastMultiLinesBlock = {
         type: 'text',
         content: line.trim()
       };
-      pushed = false;
     }
   }
 
   // Avoid the last block is omitted
-  if (!pushed) {
-    mdBlocks.push(lastTextQuoteBlock);
-    pushed = true;
-  }
-
+  flush();
   return mdBlocks;
 }
 
@@ -105,11 +122,15 @@ function handleTags(mdBlocks: MDBlock[]): string {
         result += `<p>${content}</p>` +
                   '\n';
         break;
-      case "header":
+      case "heading":
         result += `<h${block.level}>${content}</h${block.level}>` +
                   '\n';
         break;
       case "quote":
+        result += `<blockquote>${content}</blockquote>` +
+                  '\n';
+        break;
+      case 'list':
       case "code":
     }
   }

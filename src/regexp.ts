@@ -1,5 +1,7 @@
-const headerReg = /^\s*(#{1,6})(?:\s+|$)(.*)$/;
+const headingReg = /^\s*(#{1,6})(?:\s+|$)(.*)$/;
+const quoteReg = /^>\s*(.*)$/;
 
 export {
-  headerReg
+  headingReg,
+  quoteReg
 };
