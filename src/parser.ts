@@ -23,8 +23,8 @@
  * is one paragraph as well.
  */
 
-import { headingReg, ulistReg, quoteReg } from "./regexp";
-import { HeadingLevel, MDBlock, MultiLinesBlock } from "./type";
+import { headingReg, ulistReg, quoteReg, olistReg } from "./regexp";
+import { HeadingLevel, MDBlock, MultiLinesBlock, OListDelimiter, UListSign } from "./type";
 
 /* The main parse logic */
 export function parse(markdown: string): string {
@@ -92,14 +92,45 @@ function parseToBlocks(lines: string[]): MDBlock[] {
     // Unordered List
     const ulistM = line.match(ulistReg);
     if (ulistM) {
+      if (lastMultiLinesBlock?.type === 'ulist' && lastMultiLinesBlock.sign === ulistM[1]) {
+        lastMultiLinesBlock.items.push(ulistM[2].trim());
+      } else {
+        flush();
+        lastMultiLinesBlock = {
+          type: 'ulist',
+          sign: ulistM[1] as UListSign,
+          items: [ulistM[2].trim()]
+        }
+      }
+      continue;
+    }
+
+    // Ordered List
+    const olistM = line.match(olistReg);
+    if (olistM) {
+      if (lastMultiLinesBlock?.type === 'olist' && lastMultiLinesBlock.delimiter === olistM[1]) {
+        lastMultiLinesBlock.items.push(olistM[2].trim());
+      } else {
+        flush();
+        lastMultiLinesBlock = {
+          type: 'olist',
+          delimiter: olistM[1] as OListDelimiter,
+          items: [olistM[2].trim()]
+        }
+      }
+      continue;
     }
 
     // Fall back to plain text
     if (
       lastMultiLinesBlock &&
-      ['text', 'quote'].includes(lastMultiLinesBlock.type)
+      ['text', 'quote', 'ulist', 'olist'].includes(lastMultiLinesBlock.type)
     ) {
-      lastMultiLinesBlock.content += ' ' + line.trim();
+      if (lastMultiLinesBlock.type === 'ulist' || lastMultiLinesBlock.type === 'olist') {
+        lastMultiLinesBlock.items[lastMultiLinesBlock.items.length-1] += ' ' + line.trim();
+      } else {
+        lastMultiLinesBlock.content += ' ' + line.trim();
+      }
     } else {
       flush();
       lastMultiLinesBlock = {
@@ -120,22 +151,31 @@ function handleTags(mdBlocks: MDBlock[]): string {
 
   for (const block of mdBlocks) {
     const type = block.type;
-    const content = signToTag(block);
 
     switch (type) {
       case "text":
-        result += `<p>${content}</p>` +
-                  '\n';
+        result += `<p>${signToTag(block.content)}</p>\n`;
         break;
       case "heading":
-        result += `<h${block.level}>${content}</h${block.level}>` +
-                  '\n';
+        result += `<h${block.level}>${signToTag(block.content)}</h${block.level}>\n`;
         break;
       case "quote":
-        result += `<blockquote>${content}</blockquote>` +
-                  '\n';
+        result += `<blockquote>${signToTag(block.content)}</blockquote>\n`;
         break;
-      case 'list':
+      case 'ulist':
+        result += '<ul>\n' +
+          block.items
+            .map(item => `  <li>${signToTag(item)}<li>`)
+            .join('\n') +
+          '\n</ul>\n';
+        break;
+      case 'olist':
+        result += '<ol>\n' +
+          block.items
+            .map(item => `  <li>${signToTag(item)}<li>`)
+            .join('\n') +
+          '\n</ol>\n';
+        break;
       case "code":
     }
   }
@@ -143,6 +183,6 @@ function handleTags(mdBlocks: MDBlock[]): string {
   return result;
 }
 
-function signToTag(block: MDBlock): string {
-  return block.content;
+function signToTag(content: string): string {
+  return content;
 }

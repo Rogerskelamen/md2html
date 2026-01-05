@@ -1,7 +1,13 @@
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+export type UListSign = '-' | '+' | '*';
+export type OListDelimiter = '.' | ')';
 
 interface MDBlockBasic {
   content: string;
+}
+
+interface ListBlockBasic {
+  items: string[];
 }
 
 interface TextBlock extends MDBlockBasic {
@@ -17,13 +23,14 @@ interface QuoteBlock extends MDBlockBasic {
   type: 'quote';
 }
 
-interface UListBlock extends MDBlockBasic {
+interface UListBlock extends ListBlockBasic {
   type: 'ulist';
-  sign: 'minus' | 'plus' | 'star';
+  sign: UListSign;
 }
 
-interface OListBlock extends MDBlockBasic {
+interface OListBlock extends ListBlockBasic {
   type: 'olist';
+  delimiter: OListDelimiter;
 }
 
 interface CodeBlock extends MDBlockBasic {
