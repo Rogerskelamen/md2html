@@ -17,8 +17,13 @@ interface QuoteBlock extends MDBlockBasic {
   type: 'quote';
 }
 
-interface ListBlock extends MDBlockBasic {
-  type: 'list';
+interface UListBlock extends MDBlockBasic {
+  type: 'ulist';
+  sign: 'minus' | 'plus' | 'star';
+}
+
+interface OListBlock extends MDBlockBasic {
+  type: 'olist';
 }
 
 interface CodeBlock extends MDBlockBasic {
@@ -28,7 +33,8 @@ interface CodeBlock extends MDBlockBasic {
 export type MultiLinesBlock =
   TextBlock  |
   QuoteBlock |
-  ListBlock  |
+  UListBlock |
+  OListBlock |
   CodeBlock;
 
 export type MDBlock = MultiLinesBlock | HeadingBlock;

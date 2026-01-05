@@ -23,7 +23,7 @@
  * is one paragraph as well.
  */
 
-import { headingReg, quoteReg } from "./regexp";
+import { headingReg, ulistReg, quoteReg } from "./regexp";
 import { HeadingLevel, MDBlock, MultiLinesBlock } from "./type";
 
 /* The main parse logic */
@@ -89,6 +89,11 @@ function parseToBlocks(lines: string[]): MDBlock[] {
       continue;
     }
 
+    // Unordered List
+    const ulistM = line.match(ulistReg);
+    if (ulistM) {
+    }
+
     // Fall back to plain text
     if (
       lastMultiLinesBlock &&
@@ -115,7 +120,7 @@ function handleTags(mdBlocks: MDBlock[]): string {
 
   for (const block of mdBlocks) {
     const type = block.type;
-    const content = tagSwtich(block);
+    const content = signToTag(block);
 
     switch (type) {
       case "text":
@@ -138,6 +143,6 @@ function handleTags(mdBlocks: MDBlock[]): string {
   return result;
 }
 
-function tagSwtich(block: MDBlock): string {
+function signToTag(block: MDBlock): string {
   return block.content;
 }
