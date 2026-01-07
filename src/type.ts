@@ -2,47 +2,51 @@ export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export type UListSign = '-' | '+' | '*';
 export type OListDelimiter = '.' | ')';
 
-interface MDBlockBasic {
+/* *
+ * 'line element' means this element is render as one line, no crossing line.
+ * On the other hand, 'block element' gathers lots of lines as one structure.
+ */
+interface MDLineElement {
   content: string;
 }
 
-interface ListBlockBasic {
+interface MDBlockElement {
   items: string[];
 }
 
-interface TextBlock extends MDBlockBasic {
+interface TextElement extends MDLineElement {
   type: 'text';
 }
 
-interface HeadingBlock extends MDBlockBasic {
+interface HeadingElement extends MDLineElement {
   type: 'heading';
   level: HeadingLevel;
 }
 
-interface QuoteBlock extends MDBlockBasic {
+interface QuoteElement extends MDLineElement {
   type: 'quote';
 }
 
-interface UListBlock extends ListBlockBasic {
+interface UListElement extends MDBlockElement {
   type: 'ulist';
   sign: UListSign;
 }
 
-interface OListBlock extends ListBlockBasic {
+interface OListElement extends MDBlockElement {
   type: 'olist';
   delimiter: OListDelimiter;
 }
 
-interface CodeBlock extends MDBlockBasic {
+interface CodeElement extends MDBlockElement {
   type: 'code';
 }
 
-export type MultiLinesBlock =
-  TextBlock  |
-  QuoteBlock |
-  UListBlock |
-  OListBlock |
-  CodeBlock;
+export type FlowElement =
+  TextElement  |
+  QuoteElement |
+  UListElement |
+  OListElement |
+  CodeElement;
 
-export type MDBlock = MultiLinesBlock | HeadingBlock;
+export type MDElement = FlowElement | HeadingElement;
 

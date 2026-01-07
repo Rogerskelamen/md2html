@@ -24,7 +24,7 @@
  */
 
 import { headingReg, ulistReg, quoteReg, olistReg } from "./regexp";
-import { HeadingLevel, MDBlock, MultiLinesBlock, OListDelimiter, UListSign } from "./type";
+import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "./type";
 
 /* The main parse logic */
 export function parse(markdown: string): string {
@@ -33,7 +33,7 @@ export function parse(markdown: string): string {
   const lines = markdown.split(crlfReg);
   // console.log(lines);
 
-  const mdBlocks = parseToBlocks(lines);
+  const mdBlocks = parseToElements(lines);
   // console.log(mdBlocks);
   const html = handleTags(mdBlocks);
 
@@ -41,16 +41,17 @@ export function parse(markdown: string): string {
 }
 
 /**
- * Traverse lines to turn to blocks with different types
+ * Traverse lines to turn to markdown elements with different well-designed structures
  */
-function parseToBlocks(lines: string[]): MDBlock[] {
-  let lastMultiLinesBlock: MultiLinesBlock | null = null;
-  const mdBlocks: MDBlock[] = [];
+function parseToElements(lines: string[]): MDElement[] {
+  let lastFlowElement: FlowElement | null = null;
+  const mdElements: MDElement[] = [];
 
+  /* Push last flow text element into the return value */
   const flush = () => {
-    if (lastMultiLinesBlock) {
-      mdBlocks.push(lastMultiLinesBlock);
-      lastMultiLinesBlock = null;
+    if (lastFlowElement) {
+      mdElements.push(lastFlowElement);
+      lastFlowElement = null;
     }
   }
 
@@ -65,7 +66,7 @@ function parseToBlocks(lines: string[]): MDBlock[] {
     const headingM = line.match(headingReg);
     if (headingM) {
       flush();
-      mdBlocks.push({
+      mdElements.push({
         type: 'heading',
         level: headingM[1].length as HeadingLevel,
         content: headingM[2].trim()
@@ -77,11 +78,11 @@ function parseToBlocks(lines: string[]): MDBlock[] {
     const quoteM = line.match(quoteReg);
     if (quoteM) {
       /* Last line is quote as well */
-      if (lastMultiLinesBlock?.type === 'quote') {
-        lastMultiLinesBlock.content += ' ' + quoteM[1].trim();
+      if (lastFlowElement?.type === 'quote') {
+        lastFlowElement.content += ' ' + quoteM[1].trim();
       } else {
         flush();
-        lastMultiLinesBlock = {
+        lastFlowElement = {
           type: 'quote',
           content: quoteM[1].trim()
         };
@@ -92,11 +93,11 @@ function parseToBlocks(lines: string[]): MDBlock[] {
     // Unordered List
     const ulistM = line.match(ulistReg);
     if (ulistM) {
-      if (lastMultiLinesBlock?.type === 'ulist' && lastMultiLinesBlock.sign === ulistM[1]) {
-        lastMultiLinesBlock.items.push(ulistM[2].trim());
+      if (lastFlowElement?.type === 'ulist' && lastFlowElement.sign === ulistM[1]) {
+        lastFlowElement.items.push(ulistM[2].trim());
       } else {
         flush();
-        lastMultiLinesBlock = {
+        lastFlowElement = {
           type: 'ulist',
           sign: ulistM[1] as UListSign,
           items: [ulistM[2].trim()]
@@ -108,11 +109,11 @@ function parseToBlocks(lines: string[]): MDBlock[] {
     // Ordered List
     const olistM = line.match(olistReg);
     if (olistM) {
-      if (lastMultiLinesBlock?.type === 'olist' && lastMultiLinesBlock.delimiter === olistM[1]) {
-        lastMultiLinesBlock.items.push(olistM[2].trim());
+      if (lastFlowElement?.type === 'olist' && lastFlowElement.delimiter === olistM[1]) {
+        lastFlowElement.items.push(olistM[2].trim());
       } else {
         flush();
-        lastMultiLinesBlock = {
+        lastFlowElement = {
           type: 'olist',
           delimiter: olistM[1] as OListDelimiter,
           items: [olistM[2].trim()]
@@ -123,17 +124,17 @@ function parseToBlocks(lines: string[]): MDBlock[] {
 
     // Fall back to plain text
     if (
-      lastMultiLinesBlock &&
-      ['text', 'quote', 'ulist', 'olist'].includes(lastMultiLinesBlock.type)
+      lastFlowElement &&
+      ['text', 'quote', 'ulist', 'olist'].includes(lastFlowElement.type)
     ) {
-      if (lastMultiLinesBlock.type === 'ulist' || lastMultiLinesBlock.type === 'olist') {
-        lastMultiLinesBlock.items[lastMultiLinesBlock.items.length-1] += ' ' + line.trim();
+      if (lastFlowElement.type === 'ulist' || lastFlowElement.type === 'olist') {
+        lastFlowElement.items[lastFlowElement.items.length-1] += ' ' + line.trim();
       } else {
-        lastMultiLinesBlock.content += ' ' + line.trim();
+        lastFlowElement.content += ' ' + line.trim();
       }
     } else {
       flush();
-      lastMultiLinesBlock = {
+      lastFlowElement = {
         type: 'text',
         content: line.trim()
       };
@@ -142,11 +143,11 @@ function parseToBlocks(lines: string[]): MDBlock[] {
 
   // Avoid the last block is omitted
   flush();
-  return mdBlocks;
+  return mdElements;
 }
 
 /* traverse markdown content blocks and wrap text with tags at proper positions. */
-function handleTags(mdBlocks: MDBlock[]): string {
+function handleTags(mdBlocks: MDElement[]): string {
   let result = '';
 
   for (const block of mdBlocks) {
