@@ -34,6 +34,7 @@ interface UListElement extends MDBlockElement {
 
 interface OListElement extends MDBlockElement {
   type: 'olist';
+  start: number;
   delimiter: OListDelimiter;
 }
 

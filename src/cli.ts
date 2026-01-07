@@ -14,13 +14,14 @@ function command(): void {
   /* Config arguments info */
   program
     .option('-f, --file <path>', 'source file path')
+    .option('-o, --output <path>', 'output file path')
     .argument('[input]', 'input content')
 
   /* Parse the cli options */
   program.parse(process.argv);
 
   /* Validation check */
-  const options = program.opts<{ file?: string }>();
+  const options = program.opts<{ file?: string, output?: string }>();
   const input = program.args[0] as string | undefined;
 
   const hasFile = typeof options.file === 'string';
@@ -46,7 +47,13 @@ function command(): void {
       })()
     : input!;
 
-  console.log(parse(content));
+  const html = parse(content);
+
+  if (typeof options.output === 'string') {
+    fs.writeFileSync(options.output, html, 'utf-8');
+    return;
+  }
+  console.log(html);
 }
 
 command();

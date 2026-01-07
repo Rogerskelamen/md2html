@@ -33,9 +33,9 @@ export function parse(markdown: string): string {
   const lines = markdown.split(crlfReg);
   // console.log(lines);
 
-  const mdBlocks = parseToElements(lines);
-  // console.log(mdBlocks);
-  const html = handleTags(mdBlocks);
+  const mdElements = parseToElements(lines);
+  // console.log(mdElements);
+  const html = handleTags(mdElements);
 
   return html;
 }
@@ -109,14 +109,15 @@ function parseToElements(lines: string[]): MDElement[] {
     // Ordered List
     const olistM = line.match(olistReg);
     if (olistM) {
-      if (lastFlowElement?.type === 'olist' && lastFlowElement.delimiter === olistM[1]) {
-        lastFlowElement.items.push(olistM[2].trim());
+      if (lastFlowElement?.type === 'olist' && lastFlowElement.delimiter === olistM[2]) {
+        lastFlowElement.items.push(olistM[3].trim());
       } else {
         flush();
         lastFlowElement = {
           type: 'olist',
-          delimiter: olistM[1] as OListDelimiter,
-          items: [olistM[2].trim()]
+          start: parseInt(olistM[1]),
+          delimiter: olistM[2] as OListDelimiter,
+          items: [olistM[3].trim()]
         }
       }
       continue;
@@ -147,33 +148,33 @@ function parseToElements(lines: string[]): MDElement[] {
 }
 
 /* traverse markdown content blocks and wrap text with tags at proper positions. */
-function handleTags(mdBlocks: MDElement[]): string {
+function handleTags(mdElements: MDElement[]): string {
   let result = '';
 
-  for (const block of mdBlocks) {
-    const type = block.type;
+  for (const element of mdElements) {
+    const type = element.type;
 
     switch (type) {
       case "text":
-        result += `<p>${signToTag(block.content)}</p>\n`;
+        result += `<p>${signToTag(element.content)}</p>\n`;
         break;
       case "heading":
-        result += `<h${block.level}>${signToTag(block.content)}</h${block.level}>\n`;
+        result += `<h${element.level}>${signToTag(element.content)}</h${element.level}>\n`;
         break;
       case "quote":
-        result += `<blockquote>${signToTag(block.content)}</blockquote>\n`;
+        result += `<blockquote>${signToTag(element.content)}</blockquote>\n`;
         break;
       case 'ulist':
         result += '<ul>\n' +
-          block.items
-            .map(item => `  <li>${signToTag(item)}<li>`)
+          element.items
+            .map(item => `  <li>${signToTag(item)}</li>`)
             .join('\n') +
           '\n</ul>\n';
         break;
       case 'olist':
-        result += '<ol>\n' +
-          block.items
-            .map(item => `  <li>${signToTag(item)}<li>`)
+        result += `<ol start="${element.start}">\n` +
+          element.items
+            .map(item => `  <li>${signToTag(item)}</li>`)
             .join('\n') +
           '\n</ol>\n';
         break;
