@@ -25,7 +25,7 @@
 
 import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg } from "./regexp";
 import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "../types";
-import { htmlToPlainText, signToTag } from "./process";
+import { htmlToPlainText, inlineParse } from "./process";
 
 /* The main parse logic */
 export function parse(markdown: string): string {
@@ -179,25 +179,25 @@ function handleTags(mdElements: MDElement[]): string {
 
     switch (type) {
       case "text":
-        result += `<p>${signToTag(element.content)}</p>\n`;
+        result += `<p>${inlineParse(element.content)}</p>\n`;
         break;
       case "heading":
-        result += `<h${element.level}>${signToTag(element.content)}</h${element.level}>\n`;
+        result += `<h${element.level}>${inlineParse(element.content)}</h${element.level}>\n`;
         break;
       case "quote":
-        result += `<blockquote>${signToTag(element.content)}</blockquote>\n`;
+        result += `<quote>${inlineParse(element.content)}</quote>\n`;
         break;
       case 'ulist':
         result += '<ul>\n' +
           element.items
-            .map(item => `  <li>${signToTag(item)}</li>`)
+            .map(item => `  <li>${inlineParse(item)}</li>`)
             .join('\n') +
           '\n</ul>\n';
         break;
       case 'olist':
         result += `<ol start="${element.start}">\n` +
           element.items
-            .map(item => `  <li>${signToTag(item)}</li>`)
+            .map(item => `  <li>${inlineParse(item)}</li>`)
             .join('\n') +
           '\n</ol>\n';
         break;
