@@ -40,6 +40,7 @@ interface OListElement extends MDBlockElement {
 
 interface CodeElement extends MDBlockElement {
   type: 'code';
+  lang: string;
 }
 
 export type FlowElement =

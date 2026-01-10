@@ -23,7 +23,7 @@
  * is one paragraph as well.
  */
 
-import { headingReg, ulistReg, quoteReg, olistReg } from "./regexp";
+import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg } from "./regexp";
 import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "./type";
 
 /* The main parse logic */
@@ -56,6 +56,16 @@ function parseToElements(lines: string[]): MDElement[] {
   }
 
   for (const line of lines) {
+    // Code End
+    if (lastFlowElement?.type === 'code') {
+      if (codeEndReg.test(line)) {
+        flush();
+      } else {
+        lastFlowElement.items.push(line);
+      }
+      continue;
+    }
+
     // Empty line
     if (!line.trim()) {
       flush();
@@ -123,6 +133,18 @@ function parseToElements(lines: string[]): MDElement[] {
       continue;
     }
 
+    // Code Start
+    const codeStartM = line.match(codeStartReg);
+    if (codeStartM) {
+      flush();
+      lastFlowElement = {
+        type: 'code',
+        lang: codeStartM[1],
+        items: []
+      }
+      continue;
+    }
+
     // Fall back to plain text
     if (
       lastFlowElement &&
@@ -142,12 +164,12 @@ function parseToElements(lines: string[]): MDElement[] {
     }
   }
 
-  // Avoid the last block is omitted
+  // Avoid the last element is omitted
   flush();
   return mdElements;
 }
 
-/* traverse markdown content blocks and wrap text with tags at proper positions. */
+/* traverse markdown content elements and wrap text with tags at proper positions. */
 function handleTags(mdElements: MDElement[]): string {
   let result = '';
 
@@ -179,6 +201,12 @@ function handleTags(mdElements: MDElement[]): string {
           '\n</ol>\n';
         break;
       case "code":
+        result += '<code>\n' +
+          element.items
+            .map(item => `  <p>${htmlToPlainText(item)}</p>`)
+            .join('\n') +
+          '\n</code>\n';
+        break;
     }
   }
 
@@ -186,5 +214,9 @@ function handleTags(mdElements: MDElement[]): string {
 }
 
 function signToTag(content: string): string {
+  return content;
+}
+
+function htmlToPlainText(content: string): string {
   return content;
 }
