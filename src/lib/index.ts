@@ -24,7 +24,8 @@
  */
 
 import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg } from "./regexp";
-import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "./type";
+import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "../types";
+import { htmlToPlainText, signToTag } from "./process";
 
 /* The main parse logic */
 export function parse(markdown: string): string {
@@ -213,10 +214,3 @@ function handleTags(mdElements: MDElement[]): string {
   return result;
 }
 
-function signToTag(content: string): string {
-  return content;
-}
-
-function htmlToPlainText(content: string): string {
-  return content;
-}
