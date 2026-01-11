@@ -2,7 +2,7 @@
   "name": "@rokelamen/md2html",
   "type": "module",
   "version": "0.1.4",
-  "description": "A simple tool to convert markdown content to html",
+  "description": "A simple tool to convert Markdown content to HTML",
   "author": "rokelamen <rogerskelamen@gmail.com>",
   "license": "MIT",
   "main": "./dist/index.js",
