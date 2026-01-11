@@ -23,7 +23,7 @@
  * is one paragraph as well.
  */
 
-import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg } from "./regexp";
+import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg, delimiterReg } from "./regexp";
 import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "../types";
 import { renderToHtml } from "./render";
 
@@ -70,6 +70,13 @@ function parseToElements(lines: string[]): MDElement[] {
     // Empty line
     if (!line.trim()) {
       flush();
+      continue;
+    }
+
+    // Delimiter
+    if (delimiterReg.test(line)) {
+      flush();
+      mdElements.push({ type: 'delimiter' });
       continue;
     }
 

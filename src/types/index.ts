@@ -18,7 +18,7 @@ interface TextElement extends MDLineElement {
   type: 'text';
 }
 
-interface DelimiterElement extends MDLineElement {
+interface DelimiterElement {
   type: 'delimiter';
 }
 
@@ -54,5 +54,5 @@ export type FlowElement =
   OListElement |
   CodeElement;
 
-export type MDElement = FlowElement | HeadingElement;
+export type MDElement = FlowElement | HeadingElement | DelimiterElement;
 

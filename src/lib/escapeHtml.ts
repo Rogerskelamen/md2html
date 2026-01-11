@@ -8,3 +8,4 @@
 export function escapeHtml(content: string): string {
   return content;
 }
+

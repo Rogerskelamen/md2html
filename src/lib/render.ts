@@ -10,13 +10,16 @@ export function renderToHtml(mdElements: MDElement[]): string {
     const type = element.type;
 
     switch (type) {
-      case "text":
+      case 'text':
         result += `<p>${inlineParse(element.content)}</p>\n`;
         break;
-      case "heading":
+      case 'heading':
         result += `<h${element.level}>${inlineParse(element.content)}</h${element.level}>\n`;
         break;
-      case "quote":
+      case 'delimiter':
+        result += `<hr>\n`;
+        break;
+      case 'quote':
         result += `<quote>${inlineParse(element.content)}</quote>\n`;
         break;
       case 'ulist':
@@ -33,7 +36,7 @@ export function renderToHtml(mdElements: MDElement[]): string {
             .join('\n') +
           '\n</ol>\n';
         break;
-      case "code":
+      case 'code':
         result += '<code>\n' +
           element.items
             .map(item => `  <p>${escapeHtml(item)}</p>`)
