@@ -18,6 +18,10 @@ interface TextElement extends MDLineElement {
   type: 'text';
 }
 
+interface DelimiterElement extends MDLineElement {
+  type: 'delimiter';
+}
+
 interface HeadingElement extends MDLineElement {
   type: 'heading';
   level: HeadingLevel;
