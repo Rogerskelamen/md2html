@@ -25,7 +25,7 @@
 
 import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg } from "./regexp";
 import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "../types";
-import { htmlToPlainText, inlineParse } from "./process";
+import { renderToHtml } from "./render";
 
 /* The main parse logic */
 export function parse(markdown: string): string {
@@ -36,7 +36,7 @@ export function parse(markdown: string): string {
 
   const mdElements = parseToElements(lines);
   // console.log(mdElements);
-  const html = handleTags(mdElements);
+  const html = renderToHtml(mdElements);
 
   return html;
 }
@@ -168,49 +168,5 @@ function parseToElements(lines: string[]): MDElement[] {
   // Avoid the last element is omitted
   flush();
   return mdElements;
-}
-
-/* traverse markdown content elements and wrap text with tags at proper positions. */
-function handleTags(mdElements: MDElement[]): string {
-  let result = '';
-
-  for (const element of mdElements) {
-    const type = element.type;
-
-    switch (type) {
-      case "text":
-        result += `<p>${inlineParse(element.content)}</p>\n`;
-        break;
-      case "heading":
-        result += `<h${element.level}>${inlineParse(element.content)}</h${element.level}>\n`;
-        break;
-      case "quote":
-        result += `<quote>${inlineParse(element.content)}</quote>\n`;
-        break;
-      case 'ulist':
-        result += '<ul>\n' +
-          element.items
-            .map(item => `  <li>${inlineParse(item)}</li>`)
-            .join('\n') +
-          '\n</ul>\n';
-        break;
-      case 'olist':
-        result += `<ol start="${element.start}">\n` +
-          element.items
-            .map(item => `  <li>${inlineParse(item)}</li>`)
-            .join('\n') +
-          '\n</ol>\n';
-        break;
-      case "code":
-        result += '<code>\n' +
-          element.items
-            .map(item => `  <p>${htmlToPlainText(item)}</p>`)
-            .join('\n') +
-          '\n</code>\n';
-        break;
-    }
-  }
-
-  return result;
 }
 
