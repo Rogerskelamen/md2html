@@ -9,7 +9,8 @@ const codeEndReg = /^```\s*$/;
 
 /* For text inline pattern pair */
 const inlineCodeReg = /(`+)([^`]+?)\1/g;
-const hyperLinkReg = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+const imgReg = /!\[([^\]]+)\]\(([^)\s]+)\)/g;
+const linkReg = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const boldItalicReg = /(\*\*\*|___)([^*_]+)\1/g;
 const boldReg = /(\*\*|__)([^*_]+)\1/g;
 const italicReg = /([*_])([^*_]+)\1/g;
@@ -26,8 +27,10 @@ export {
 
 export {
   inlineCodeReg,
-  hyperLinkReg,
+  imgReg,
+  linkReg,
   boldItalicReg,
   boldReg,
   italicReg
 };
+

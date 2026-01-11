@@ -1,4 +1,4 @@
-import { boldItalicReg, boldReg, hyperLinkReg, inlineCodeReg, italicReg } from "./regexp";
+import { boldItalicReg, boldReg, linkReg, inlineCodeReg, italicReg, imgReg } from "./regexp";
 
 export function inlineParse(content: string): string {
   const placeholders: string[] = [];
@@ -20,7 +20,8 @@ export function inlineParse(content: string): string {
 
   // 2. link and emphasis
   content = content
-    .replace(hyperLinkReg, '<a href="$2">$1</a>')
+    .replace(imgReg, '<img src="$2" alt="$1">')
+    .replace(linkReg, '<a href="$2">$1</a>')
     .replace(boldItalicReg, '<strong><em>$2</em></strong>')
     .replace(boldReg, '<strong>$2</strong>')
     .replace(italicReg, '<em>$2</em>');
