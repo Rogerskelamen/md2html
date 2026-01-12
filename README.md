@@ -14,6 +14,14 @@ To stay as close as possible to the 'Standard Markdown', [CommonMark](https://co
 
 [Node](https://nodejs.org/) environment(>= v12.0.0) is necessary.
 
+## Installation
+
+Using npm:
+
+```sh
+npm i -g @rokelamen/md2html
+```
+
 ## Usage
 
 ```sh
