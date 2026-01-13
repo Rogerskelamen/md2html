@@ -6,6 +6,13 @@
  * This function is intended to remove all such representations.
  */
 export function escapeHtml(content: string): string {
+  content = content
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
   return content;
 }
 

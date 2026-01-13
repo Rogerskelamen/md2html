@@ -37,11 +37,11 @@ export function renderToHtml(mdElements: MDElement[]): string {
           '\n</ol>\n';
         break;
       case 'code':
-        result += '<code>\n' +
+        result += '<pre>\n' +
           element.items
-            .map(item => `  <p>${escapeHtml(item)}</p>`)
+            .map(item => `<code>${escapeHtml(item)}</code>`)
             .join('\n') +
-          '\n</code>\n';
+          '\n</pre>\n';
         break;
     }
   }
