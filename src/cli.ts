@@ -15,13 +15,18 @@ function command(): void {
   program
     .option('-f, --file <path>', 'source file path')
     .option('-o, --output <path>', 'output file path')
-    .argument('[input]', 'input content')
+    .option('-s, --style', 'output full html struct with style')
+    .argument('[input]', 'input content');
 
   /* Parse the cli options */
   program.parse(process.argv);
 
   /* Validation check */
-  const options = program.opts<{ file?: string, output?: string }>();
+  const options = program.opts<{
+    file?: string,
+    output?: string,
+    style?: boolean
+  }>();
   const input = program.args[0] as string | undefined;
 
   const hasFile = typeof options.file === 'string';
@@ -47,7 +52,7 @@ function command(): void {
       })()
     : input!;
 
-  const html = parse(content);
+  const html = parse(content, options.style);
 
   if (typeof options.output === 'string') {
     fs.writeFileSync(options.output, html, 'utf-8');

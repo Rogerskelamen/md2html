@@ -26,9 +26,10 @@
 import { headingReg, ulistReg, quoteReg, olistReg, codeStartReg, codeEndReg, delimiterReg } from "./regexp";
 import { HeadingLevel, MDElement, FlowElement, OListDelimiter, UListSign } from "../types";
 import { renderToHtml } from "./render";
+import { wrapHtmlTemplate } from "./html";
 
 /* The main parse logic */
-export function parse(markdown: string): string {
+export function parse(markdown: string, hasStyle?: boolean): string {
   /* Split markdown content to many lines */
   const crlfReg = /\r?\n/;
   const lines = markdown.split(crlfReg);
@@ -38,7 +39,7 @@ export function parse(markdown: string): string {
   // console.log(mdElements);
   const html = renderToHtml(mdElements);
 
-  return html;
+  return hasStyle ? wrapHtmlTemplate(html) : html;
 }
 
 /**

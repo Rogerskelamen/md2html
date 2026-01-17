@@ -2,6 +2,8 @@
 
 A simple markdown-html converter written in Typescript.
 
+The style relies on browser pure style, inspired by [`txti`](https://txti.es/).
+
 ## Goal
 
 > I create this project for learning TS and node dev, not for the purpose of building another better markdown parse engine.
