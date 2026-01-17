@@ -26,25 +26,28 @@ body {
 h1, h2, h3 {
   line-height: 1.2;
 }
-body > pre {
+pre {
   background-color: #f8f8f8;
   padding: 18px;
-  font-size: 85%;
   border-radius: 5px;
 }
-p > code {
+code {
   padding: 3px 5px;
   border-radius: 5px;
   background-color: #f4f4f4;
   font-size: 85%;
 }
+pre code {
+  background-color: transparent;
+}
 blockquote {
   margin: 0;
-  border-left: 4px solid #dfe2e5;
-  padding: 0 1rem;
+  border-left: 5px solid #dfe2e5;
+  padding: 0 18px;
 }
-blockquote > p {
+blockquote > * {
   margin: 0;
+  padding: 0;
   color: #888;
 }
 `;
