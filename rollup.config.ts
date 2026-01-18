@@ -39,7 +39,7 @@ const libBundle = {
   plugins: [
     resolve(),
     typescript({
-      tsconfig: './tsconfig.json'
+      tsconfig: './tsconfig.types.json',
     })
   ]
 };
