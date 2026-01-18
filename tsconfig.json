@@ -11,7 +11,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    // "removeComments": true,
+    "removeComments": true,
 
     // Style Options
     // "noImplicitReturns": true,
