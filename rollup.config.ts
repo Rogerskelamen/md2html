@@ -2,6 +2,7 @@ import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import babel from '@rollup/plugin-babel';
 
 /* Export as a command line */
 const cliBundle = {
@@ -17,6 +18,13 @@ const cliBundle = {
     json(),
     typescript({
       tsconfig: './tsconfig.json'
+    }),
+    babel({
+      babelHelpers: 'bundled',
+      extensions: ['.js', '.ts'],
+      presets: [
+        ['@babel/preset-env', { targets: { node: '10' } }]
+      ]
     })
   ]
 };
